@@ -20,7 +20,7 @@ class Run:
         self.lr = lr
         self.batch_size = batch_size
 
-        self.train_set, _ = self._create_dataloader()
+        self.train_set, self.test_set = self._create_dataloader()
         self.continue_ = continue_
     
     def _create_dataloader(self):
@@ -78,12 +78,19 @@ class Run:
         torch.save(autoencoder.state_dict(), self.model_path)
         print("finished training")
 
-    def save_bottlenecks(self, bottleneck_path: str=""):
+    def save_bottlenecks(self, bottleneck_path: str="", dataset_type: str="train"):
+        if dataset_type == "train":
+            dataset = self.train_set
+        elif dataset_type == "test":
+            dataset = self.test_set
+        else:
+            raise ValueError("'dataset_type' must be 'train' or 'test' !")
+
         autoencoder = Autoencoder().cuda()
         autoencoder.load_state_dict(torch.load(self.model_path))
         
         total_bottlenecks = []
-        for samples, targets in self.train_set:
+        for samples, targets in dataset:
             samples = samples.float().cuda()
 
             bottlenecks = autoencoder.eval()(samples, return_bottlenecks=True)
@@ -104,20 +111,7 @@ run = Run(dataset_paths=["../datasets/iris-dataset/iris_train.json", "../dataset
           batch_size=4,
           continue_=False)
 
-run.train()
-run.save_bottlenecks(bottleneck_path="iris_reduced.json")
+# run.train()
+# run.save_bottlenecks(bottleneck_path="iris_train_reduced.json", dataset_type="train")
+# run.save_bottlenecks(bottleneck_path="iris_test_reduced.json", dataset_type="test")
 
-
-"""with open("iris_reduced.json", "r") as f:
-    data = json.load(f)
-
-
-set1x, set1y = [d[0][0] for d in data if d[1] == [1, 0, 0]], [d[0][1] for d in data if d[1] == [1, 0, 0]]
-set2x, set2y = [d[0][0] for d in data if d[1] == [0, 1, 0]], [d[0][1] for d in data if d[1] == [0, 1, 0]]
-set3x, set3y = [d[0][0] for d in data if d[1] == [0, 0, 1]], [d[0][1] for d in data if d[1] == [0, 0, 1]]
-
-plt.scatter(set1x, set1y, c="r")
-plt.scatter(set2x, set2y, c="b")
-plt.scatter(set3x, set3y, c="g")
-
-plt.show()"""
