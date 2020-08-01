@@ -21,10 +21,10 @@ projected_data = pca.fit_transform(data)
 # add labels to the projections
 final_projections = []
 for i in range(len(dataset)):
-    label = dataset[i]
+    label = dataset[i][1]
     final_projections.append([projected_data[i].tolist(), label])
 
-print(final_projections)
+
 # save projections
 with open("iris_reduced.json", "w+") as f:
     json.dump(final_projections, f, indent=4)
