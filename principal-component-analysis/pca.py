@@ -49,7 +49,7 @@ def create_projections(dataset: list=[]) -> list:
 
 # load datasets
 train_set = load_from_json(file_="../datasets/iris-dataset/iris_train.json")
-test_set = load_from_json(file_="../datasets/iris-dataset/iris_train.json")
+test_set = load_from_json(file_="../datasets/iris-dataset/iris_test.json")
 
 # apply PCA to create 2d projections
 train_projections = create_projections(dataset=train_set)
